@@ -1,0 +1,27 @@
+import { config } from 'dotenv';
+
+config();
+
+const {
+  PORT,
+  DATABASE_HOST,
+  DATABASE_USERNAME,
+  DATABASE_PASSWORD,
+  DATABASE_NAME,
+  DATABASE_PORT,
+  PRIVATE_KEY,
+  PUBLIC_KEY,
+  NODE_ENV,
+} = process.env;
+
+export {
+  PORT,
+  DATABASE_HOST,
+  DATABASE_USERNAME,
+  DATABASE_PASSWORD,
+  DATABASE_NAME,
+  DATABASE_PORT,
+  PRIVATE_KEY,
+  PUBLIC_KEY,
+  NODE_ENV,
+};
