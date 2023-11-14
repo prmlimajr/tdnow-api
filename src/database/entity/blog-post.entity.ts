@@ -2,19 +2,21 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Clinic } from './clinic.entity';
+import { BlogPostFile } from './blog-post-file.entity';
 
 @Entity()
 export class BlogPost {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   slug: string;
 
   @Column({ nullable: false })
@@ -25,6 +27,10 @@ export class BlogPost {
 
   @ManyToOne(() => Clinic, (clinic) => clinic.blogPosts)
   clinic: Clinic;
+
+  @OneToOne(() => BlogPostFile)
+  @JoinColumn()
+  file?: BlogPostFile;
 
   @CreateDateColumn()
   createdAt: Date;

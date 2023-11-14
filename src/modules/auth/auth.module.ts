@@ -7,10 +7,11 @@ import { User } from 'src/database/entity/user.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PRIVATE_KEY } from 'src/config/env';
 import { JwtModule } from '@nestjs/jwt';
+import { Clinic } from 'src/database/entity/clinic.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Clinic]),
     PassportModule,
     JwtModule.register({
       secret: PRIVATE_KEY,

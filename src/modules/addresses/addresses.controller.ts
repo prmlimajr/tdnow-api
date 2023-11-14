@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AddressService } from './addresses.service';
-import CreateAddressDto from './dto/create-address.dto';
+import { CreateAddressDto } from './dto/create-address.dto';
 
 @Controller('address')
 export class AddressController {

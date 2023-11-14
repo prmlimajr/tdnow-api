@@ -43,4 +43,9 @@ export class CreateUserDto {
   @IsOptional()
   @IsUUID('4', { message: 'Favor informar um id de Papel valido' })
   roleId?: string;
+
+  @ApiProperty({ example: 'uuid' })
+  @IsOptional()
+  @IsUUID('4', { message: 'Favor informar um id de Clinica valido' })
+  clinicId?: string;
 }

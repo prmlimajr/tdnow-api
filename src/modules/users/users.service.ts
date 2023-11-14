@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
 import { Paginator } from 'src/helpers/pagination/pagination';
 import { Role } from 'src/database/entity/role.entity';
+import { Clinic } from 'src/database/entity/clinic.entity';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,8 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
+    @InjectRepository(Clinic)
+    private clinicsRepository: Repository<Clinic>,
   ) {}
 
   private applyFilters(
@@ -47,6 +50,18 @@ export class UsersService {
 
     if (emailExists) {
       throw new BadRequestException('Email já cadastrado');
+    }
+
+    if (user.clinicId) {
+      const clinicExists = await this.clinicsRepository.findOne({
+        where: {
+          id: user.clinicId,
+        },
+      });
+
+      if (!clinicExists) {
+        throw new NotFoundException('Clinica não encontrada');
+      }
     }
 
     const newUser = this.usersRepository.create(user);

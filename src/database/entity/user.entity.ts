@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -13,6 +13,7 @@ import { PRIVATE_KEY } from 'src/config/env';
 import { Role } from './role.entity';
 import { compareSync } from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
+import { Clinic } from './clinic.entity';
 
 export enum DocumentType {
   CPF = 'cpf',
@@ -50,9 +51,13 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Role)
+  @OneToOne(() => Role)
   @JoinColumn()
   role: Role; // User, Admin, SuperAdmin
+
+  @OneToOne(() => Clinic)
+  @JoinColumn()
+  clinic: Clinic;
 
   toJSON() {
     return {

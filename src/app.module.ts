@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestMiddleware,
-  NestModule,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestMiddleware } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,6 +8,8 @@ import { RolesModule } from './modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { NextFunction, Request, Response } from 'express';
 import { NODE_ENV } from './config/env';
+import { BlogPostModule } from './modules/blog-post/blog-post.module';
+import { ClinicsModule } from './modules/clinics/clinics.module';
 
 @Module({
   imports: [
@@ -20,6 +17,8 @@ import { NODE_ENV } from './config/env';
     UsersModule,
     AuthModule,
     RolesModule,
+    BlogPostModule,
+    ClinicsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

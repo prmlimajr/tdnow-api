@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ContactType } from '../../../helpers/constants/contact-type';
+import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
+import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
+
+class CreateClinicContactDto {
+  contact: string;
+  type: ContactType;
+}
 
 export class CreateClinicDto {
   @IsNotEmpty({ message: 'Favor informar o nome fantasia da clinica' })
@@ -12,4 +20,12 @@ export class CreateClinicDto {
   @IsOptional()
   @IsString({ message: 'O CNPJ deve ser uma string' })
   cnpj?: string;
+
+  @IsOptional()
+  address?: CreateAddressDto;
+
+  @IsOptional()
+  contacts?: CreateClinicContactDto[];
+
+  owner: CreateUserDto;
 }

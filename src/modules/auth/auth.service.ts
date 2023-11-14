@@ -5,12 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { decode, sign } from 'jsonwebtoken';
 import { User } from 'src/database/entity/user.entity';
 import { PRIVATE_KEY } from 'src/config/env';
+import { Clinic } from 'src/database/entity/clinic.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Clinic)
+    private clinicsRepository: Repository<Clinic>,
   ) {}
 
   async login(credentials: LoginDto) {
@@ -26,12 +29,19 @@ export class AuthService {
   private async findUserByEmail(email: string) {
     const user = await this.usersRepository.findOne({
       where: { email },
-      relations: ['role'],
+      relations: ['role', 'clinic'],
     });
 
     if (!user) {
       throw new UnauthorizedException('Credenciais Inválidas');
     }
+
+    const clinic = await this.clinicsRepository.findOne({
+      where: { owner: { id: user.id } },
+      relations: ['address', 'contacts'],
+    });
+
+    user.clinic = clinic;
 
     return user;
   }
