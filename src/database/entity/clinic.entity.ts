@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -35,6 +36,9 @@ export class Clinic {
   @OneToOne(() => User, { nullable: false })
   @JoinColumn()
   owner: User;
+
+  @ManyToMany(() => User, (user) => user.clinics)
+  users: User[];
 
   @OneToMany(() => BlogPost, (blogPost) => blogPost.clinic)
   @JoinColumn()

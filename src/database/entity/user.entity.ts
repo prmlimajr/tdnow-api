@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,30 +17,18 @@ import { compareSync } from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
 import { Clinic } from './clinic.entity';
 
-export enum DocumentType {
-  CPF = 'cpf',
-  CNPJ = 'cnpj',
-  RG = 'rg',
-}
-
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })
-  firstName: string;
-
-  @Column({ nullable: true })
-  lastName: string;
-
-  @Column({ nullable: true })
-  document: string;
-
-  @Column({ nullable: true })
-  documentType: DocumentType;
+  name: string;
 
   @Column({ nullable: false })
+  phone: string;
+
+  @Column({ nullable: false, unique: true })
   @IsEmail()
   email: string;
 
@@ -55,9 +45,15 @@ export class User {
   @JoinColumn()
   role: Role; // User, Admin, SuperAdmin
 
-  @OneToOne(() => Clinic)
-  @JoinColumn()
-  clinic: Clinic;
+  @ManyToMany(() => Clinic, (clinic) => clinic.users)
+  @JoinTable()
+  clinics: Clinic[];
+
+  @Column({ nullable: true })
+  resetToken: string;
+
+  @Column({ nullable: true })
+  resetTokenExpiration: Date;
 
   toJSON() {
     return {

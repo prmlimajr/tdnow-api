@@ -37,4 +37,7 @@ export class BlogPost {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  link?: string;
 }

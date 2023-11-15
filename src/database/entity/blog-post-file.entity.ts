@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { BlogPost } from './blog-post.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class BlogPostFile {
@@ -20,8 +13,4 @@ export class BlogPostFile {
 
   @Column({ nullable: true })
   mimetype?: string;
-
-  @OneToOne(() => BlogPost, { nullable: true })
-  @JoinColumn()
-  blogPost?: BlogPost;
 }

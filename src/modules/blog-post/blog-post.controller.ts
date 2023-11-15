@@ -5,7 +5,9 @@ import {
   Param,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
@@ -15,6 +17,7 @@ import { Strategies } from 'src/helpers/constants/auth-strategies';
 import { LoggedUser } from '../auth/logged-user.decorator';
 import { User } from 'src/database/entity/user.entity';
 import { BlogPostService } from './blog-post.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Blog Post')
 @Controller('blog-post')
@@ -23,8 +26,13 @@ export class BlogPostController {
 
   @Post()
   @UseGuards(AuthGuard(Strategies.JWT))
-  create(@Body() blogPost: CreateBlogPostDto, @LoggedUser() user: User) {
-    return this.blogPostService.create(blogPost, user);
+  @UseInterceptors(FileInterceptor('file'))
+  create(
+    @Body() blogPost: CreateBlogPostDto,
+    @LoggedUser() user: User,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.blogPostService.create(blogPost, user, file);
   }
 
   @Get('/:clinicId')
@@ -35,7 +43,7 @@ export class BlogPostController {
     return this.blogPostService.listBlogPosts(page, size, clinicId);
   }
 
-  @Get('/:blogPostId')
+  @Get('post/:blogPostId')
   getBlogPostById(@Param('blogPostId') blogPostId: string) {
     return this.blogPostService.getBlogPostById(blogPostId);
   }

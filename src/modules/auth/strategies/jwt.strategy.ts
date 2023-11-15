@@ -31,12 +31,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       relations: ['role'],
     });
 
-    const clinic = await this.clinicsRepository.findOne({
+    const clinics = await this.clinicsRepository.find({
       where: { owner: { id: userId } },
       relations: ['address', 'contacts'],
     });
 
-    user.clinic = clinic;
+    user.clinics = clinics;
 
     if (!user) {
       throw new UnauthorizedException('Credenciais Inválidas');

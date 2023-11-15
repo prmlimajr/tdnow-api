@@ -21,7 +21,4 @@ export class CreateBlogPostDto {
   @IsOptional()
   @IsString({ message: 'Link do post deve ser uma string' })
   link?: string;
-
-  @IsOptional()
-  file?: Express.Multer.File;
 }

@@ -5,11 +5,11 @@ import { Repository } from 'typeorm';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { User } from 'src/database/entity/user.entity';
 import { Roles } from 'src/helpers/constants/roles';
-import { fileTypeFromBuffer } from 'file-type';
 import { v4 as uuidV4 } from 'uuid';
 import { S3Service } from '../storage/s3.service';
 import { AWS_BLOG_POST_BUCKET_NAME } from 'src/config/env';
 import { BlogPostFile } from 'src/database/entity/blog-post-file.entity';
+import { Paginator } from 'src/helpers/pagination/pagination';
 
 @Injectable()
 export class BlogPostService {
@@ -27,51 +27,56 @@ export class BlogPostService {
     });
   }
 
-  async create(blogPost: CreateBlogPostDto, user: User) {
-    if (user.role.name === Roles.USER) {
+  async create(
+    blogPost: CreateBlogPostDto,
+    user: User,
+    file: Express.Multer.File,
+  ) {
+    if (user.role.name !== Roles.ADMIN) {
       throw new ForbiddenException('Usuário não autorizado');
     }
 
-    const newBlogPost = this.blogPostRepository.create(blogPost);
+    const newBlogPost = this.blogPostRepository.create({
+      id: uuidV4(),
+      clinic: user.clinics[0],
+      ...blogPost,
+    });
 
     return this.blogPostRepository.manager.transaction(async (manager) => {
       const blogPostRepo = manager.getRepository(BlogPost);
       const blogPostFileRepo = manager.getRepository(BlogPostFile);
 
-      // if (blogPost.file) {
-      //   const { mime: mimetype } =
-      //     (await fileTypeFromBuffer(blogPost.file.buffer)) || {};
+      if (file) {
+        const fileId = uuidV4();
 
-      //   const fileId = uuidV4();
+        const path = `blog-posts/${newBlogPost.id}/${fileId}.${file.originalname}`;
 
-      //   const path = `blog-posts/${newBlogPost.id}/${fileId}.${
-      //     mimetype.split('/')[1]
-      //   }`;
+        // await this.uploadFile(file, path);
 
-      //   await this.uploadFile(blogPost.file, path);
+        const blogPostFile = blogPostFileRepo.create({
+          id: fileId,
+          name: file.originalname,
+          path,
+          mimetype: file.mimetype,
+        });
 
-      //   const blogPostFile = blogPostFileRepo.create({
-      //     id: fileId,
-      //     name: blogPost.file.originalname,
-      //     path,
-      //     mimetype: blogPost.file.mimetype,
-      //   });
+        await blogPostFileRepo.save(blogPostFile);
 
-      //   await blogPostFileRepo.save(blogPostFile);
-      // }
+        newBlogPost.file = blogPostFile;
+      }
 
       return blogPostRepo.save(newBlogPost);
     });
   }
 
   async listBlogPosts(page: number, size: number, clinicId: string) {
-    const [blogPosts, total] = await this.blogPostRepository.findAndCount({
-      where: { clinic: { id: clinicId } },
-      take: size,
-      skip: (page - 1) * size,
-    });
+    const paginator = new Paginator(this.blogPostRepository);
 
-    return { blogPosts, total };
+    const query = this.blogPostRepository
+      .createQueryBuilder('blogPost')
+      .where('blogPost.clinicId = :clinicId', { clinicId });
+
+    return paginator.paginate(page, size, query);
   }
 
   async getBlogPostById(id: string) {

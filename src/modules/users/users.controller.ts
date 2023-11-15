@@ -14,6 +14,7 @@ import { PageQueryDto } from 'src/helpers/pagination/dto/page-query.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Strategies } from 'src/helpers/constants/auth-strategies';
 import { ApiTags } from '@nestjs/swagger';
+import { VerifyUserDto } from './dto/verify-user.dto';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -21,8 +22,18 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
-  create(@Body() user: CreateUserDto) {
-    return this.usersService.create(user);
+  generateToken(@Body() user: CreateUserDto) {
+    return this.usersService.verifyUserAtCreation(user);
+  }
+
+  @Post('/verify')
+  verifyUser(@Body() verifyUserDto: VerifyUserDto) {
+    return this.usersService.verifyUser(verifyUserDto);
+  }
+
+  @Post('/resend/:email')
+  resendVerificationEmail(@Param('email') email: string) {
+    return this.usersService.resendVerificationEmail(email);
   }
 
   @Get()
